@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# Franchise Supply Training – ReactJS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dự án training ReactJS sử dụng **React + TypeScript + Vite**, phục vụ cho việc học và thực hành kiến trúc frontend thực tế (Admin / Client, Auth, Routing).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🧰 Tech Stack
 
-## React Compiler
+- **React 19**
+- **TypeScript**
+- **Vite**
+- **React Router DOM v7**
+- **Zustand** – State management
+- **React Hook Form + Zod** – Form & validation
+- **Tailwind CSS** – Styling
+- **Axios** – HTTP client
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 📦 Yêu cầu môi trường
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Node.js** ≥ 18
+- **Yarn** (Yarn Berry / Yarn v4)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+> ⚠️ Project **KHÔNG dùng npm**, vui lòng dùng **yarn**.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🚀 Cài đặt & Chạy project
+
+### 1. Cài dependencies
+
+```bash
+yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Chạy project
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+yarn dev
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Mở trình duyệt
+
+Mở trình duyệt và truy cập vào địa chỉ: [http://localhost:5173](http://localhost:5173)
+
+### 4. Build project
+
+```bash
+yarn build
+```
+
+### 5. Preview bản build
+
+```bash
+yarn preview
 ```
