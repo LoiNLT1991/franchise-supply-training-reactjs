@@ -1,29 +1,62 @@
-const ClientHeader = () => {
+import { ShoppingCart } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import UserMenu from "./ClientHeaderCustomerIcon.layout";
+import { ROUTER_URL } from "@/routes/router.const";
+import FranchiseSelect from "./ClientHeaderFranchise.layout";
+
+export default function Header() {
+  const navItems = [
+    { name: "Menu", path: ROUTER_URL.MENU },
+    { name: "About", path: ROUTER_URL.ABOUT },
+    { name: "Store Location", path: ROUTER_URL.STORE },
+    { name: "Contact", path: ROUTER_URL.CONTACT },
+  ];
+
   return (
-    <header className="sticky top-0 z-50 bg-black text-white">
+    <header className="sticky top-0 z-50 bg-red-700 text-white">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <div className="text-2xl font-bold text-red-500">FOODIX</div>
+          <div className="text-3xl font-extrabold italic tracking-wide">FOODIX</div>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <a className="hover:text-red-500">Home</a>
-            <a className="hover:text-red-500">Menu</a>
-            <a className="hover:text-red-500">About</a>
-            <a className="hover:text-red-500">Contact</a>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `hover:text-yellow-300 transition ${isActive ? "text-yellow-300 font-semibold" : ""}`
+                }
+              >
+                {item.name}
+              </NavLink>
+            ))}
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            <button className="rounded bg-red-600 px-4 py-2 text-sm font-semibold hover:bg-red-700">
-              Book a Table
-            </button>
+          {/* Right Section */}
+          <div className="flex items-center gap-6">
+            {/* Phone */}
+            <div className="hidden lg:flex flex-col text-right leading-tight">
+              <FranchiseSelect />
+            </div>
+
+            {/* Cart Button */}
+            <NavLink
+              to={ROUTER_URL.CLIENT_ROUTER.CART}
+              className="flex items-center gap-3 rounded-full bg-lime-600 px-6 py-3 text-sm font-semibold hover:bg-lime-700 transition"
+            >
+              <ShoppingCart size={18} />
+              Go to Your Cart
+            </NavLink>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4">
+              <UserMenu />
+            </div>
           </div>
         </div>
       </div>
     </header>
   );
-};
-
-export default ClientHeader;
+}

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE } from "@/consts";
-import type { UserAccount } from "@/models";
+import type { AdminAuthProfile } from "@/models";
 
 export function setItemInLocalStorage<T>(key: string, value: T): void {
   localStorage.setItem(key, JSON.stringify(value));
@@ -23,16 +23,16 @@ export function removeItemInLocalStorage(key: string): void {
 
 // ===== AUTH HELPERS =====
 
-export function getCurrentUser(): UserAccount | null {
-  return getItemInLocalStorage<UserAccount>(LOCAL_STORAGE.ACCOUNT_ADMIN);
+export function getCurrentUser(): AdminAuthProfile | null {
+  return getItemInLocalStorage<AdminAuthProfile>(LOCAL_STORAGE.ACCOUNT_USER);
 }
 
-export function getCurrentUserId(): number | null {
-  return getCurrentUser()?.id ?? null;
+export function getCurrentUserId(): string | null {
+  return getCurrentUser()?.user?.id ?? null;
 }
 
 export function getCurrentUserRole(): string | null {
-  return getCurrentUser()?.role ?? null;
+  return getCurrentUser()?.user?.id ?? null;
 }
 
 export function isUserLoggedIn(): boolean {

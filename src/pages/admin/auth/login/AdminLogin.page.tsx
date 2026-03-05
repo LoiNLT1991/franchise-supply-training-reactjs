@@ -1,96 +1,128 @@
-// src/pages/AdminLogin.page.tsx
-
-import { FAKE_USERS } from "@/consts";
+import { InputFormControl } from "@/components";
+import type { Role } from "@/models";
 import { ROUTER_URL } from "@/routes/router.const";
-import { useAuthStore } from "@/stores/auth.store";
-import { showError } from "@/utils";
-import { getCurrentUser } from "@/utils/localstorage.util";
+import { useAdminAuthStore, useLoadingStore } from "@/stores";
+import { showFormatErrors, showSuccess, showWarning } from "@/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { LoginFieldName, LoginFieldTitle } from "./models";
+import { ContextSelector } from "./partials/ContextSelector.partial";
 import { adminLoginSchema, type AdminLoginFormValues } from "./schema/adminLogin.schema";
+import { loginUseCase, switchContextUseCase } from "./usecases";
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
-  const user = getCurrentUser();
+  const setLoading = useLoadingStore((s) => s.setLoading);
+  const userProfile = useAdminAuthStore((state) => state.user);
+
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [showContextSelector, setShowContextSelector] = useState(false);
 
   const {
+    setError,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<AdminLoginFormValues>({
+    defaultValues: {
+      email: "loinguyenlamthanh@gmail.com",
+      password: "12345678",
+    },
     resolver: zodResolver(adminLoginSchema),
   });
 
   useEffect(() => {
-    if (user) {
-      navigate(`${ROUTER_URL.ADMIN}/${ROUTER_URL.ADMIN_ROUTER.DASHBOARD}`, { replace: true });
+    if (userProfile && !userProfile.active_context) {
+      setRoles(userProfile.roles);
+      setShowContextSelector(true);
     }
-  }, [user, navigate]);
+  }, []);
 
-  const onSubmit = async (data: AdminLoginFormValues) => {
-    const user = FAKE_USERS.find((user) => user.email === data.email);
+  const onLogin = async (formData: AdminLoginFormValues) => {
+    setLoading(true);
 
-    // TODO: only for demo, remove in production
-    if (!user) {
-      showError("User not found! Please check your email again!");
-      return;
+    try {
+      const result = await loginUseCase(formData);
+
+      // 1: If context is not already provided
+      if (result.type === "REQUIRE_CONTEXT") {
+        showWarning("Please select role context!");
+        setRoles(result.roles);
+        setShowContextSelector(true);
+        return;
+      }
+      showSuccess("Login successful!");
+
+      // 2: If context is already provided
+      handleRedirectAdminPage();
+    } catch (err) {
+      showFormatErrors(err, setError, "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // TODO:
-    // 1. Call login API
-    // 2. Call api get user info
-    // 3. Redirect to /admin/dashboard
+  const handleRoleSelect = async (franchise_id: string) => {
+    setLoading(true);
+    try {
+      // 1: Switch context
+      await switchContextUseCase({ franchise_id });
+      showSuccess("Login successful!");
 
-    login(user);
-    navigate(`${ROUTER_URL.ADMIN}/${ROUTER_URL.ADMIN_ROUTER.DASHBOARD}`, { replace: true });
+      // 2: Redirect
+      handleRedirectAdminPage();
+    } catch (err) {
+      showFormatErrors(err, setError, "Select context failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRedirectAdminPage = () => {
+    navigate(ROUTER_URL.ADMIN, { replace: true });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        {/* Title */}
-        <h1 className="text-2xl font-semibold text-center mb-6">Admin Login</h1>
+        {!showContextSelector ? (
+          <>
+            <h1 className="text-2xl font-semibold text-center mb-6">Admin Login</h1>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
-              placeholder="admin@example.com"
-            />
-            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
-          </div>
+            <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
+              {/* Email */}
+              <InputFormControl
+                label={LoginFieldTitle.Email}
+                register={register(LoginFieldName.Email)}
+                error={errors.email}
+                type="email"
+                placeholder="admin@example.com"
+              />
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              {...register("password")}
-              className="w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
-              placeholder="••••••••"
-            />
-            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
-          </div>
+              {/* Password */}
+              <InputFormControl
+                label={LoginFieldTitle.Password}
+                register={register(LoginFieldName.Password)}
+                error={errors.password}
+                type="password"
+                placeholder="••••••••"
+              />
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {isSubmitting ? "Logging in..." : "Login"}
-          </button>
-        </form>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+              >
+                {isSubmitting ? "Logging in..." : "Login"}
+              </button>
+            </form>
+          </>
+        ) : (
+          <ContextSelector roles={roles} onSelect={handleRoleSelect} />
+        )}
 
-        {/* Footer */}
         <div className="mt-4 text-center text-xs text-gray-500">© 2026 Your Company</div>
       </div>
     </div>

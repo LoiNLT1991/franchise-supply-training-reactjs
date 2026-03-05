@@ -1,2 +1,4 @@
 export { useLoadingStore } from "./loading.store";
-export { useAuthStore } from "./auth.store";
+export { useAdminAuthStore } from "./adminAuth.store";
+export { useCustomerAuthStore } from "./customerAuth.store";
+export { useFranchiseStore } from "./franchise.store";

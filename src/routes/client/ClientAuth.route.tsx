@@ -1,5 +1,6 @@
 import React from "react";
 import { Route } from "react-router-dom";
+import { GuestClientGuard } from "../guard/GuestGuard.route";
 import { ROUTER_URL } from "../router.const";
 
 const ClientLoginPage = React.lazy(() => import("@/pages/client/auth/login/ClientLogin.page"));
@@ -7,7 +8,14 @@ const ForgotPasswordPage = React.lazy(() => import("@/pages/client/auth/ForgotPa
 
 export const ClientAuthRoutes = (
   <>
-    <Route path={ROUTER_URL.CLIENT_ROUTER.LOGIN} element={<ClientLoginPage />} />
+    <Route
+      path={ROUTER_URL.CLIENT_ROUTER.LOGIN}
+      element={
+        <GuestClientGuard>
+          <ClientLoginPage />
+        </GuestClientGuard>
+      }
+    />
     <Route path={ROUTER_URL.CLIENT_ROUTER.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
   </>
 );
