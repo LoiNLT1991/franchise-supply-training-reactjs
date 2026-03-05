@@ -1,7 +1,7 @@
 import { HttpError } from "@/api/http.types";
-import { logoutUseCase } from "@/features";
+import { adminLogoutUseCase } from "@/features";
 import { ROUTER_URL } from "@/routes/router.const";
-import { useAuthStore, useLoadingStore } from "@/stores";
+import { useAdminAuthStore, useLoadingStore } from "@/stores";
 import { showError, showSuccess } from "@/utils";
 import { LogOut, Menu, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -12,13 +12,13 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
   const navigate = useNavigate();
-  const user = useAuthStore((state) => state.user);
+  const userProfile = useAdminAuthStore((state) => state.user);
   const setLoading = useLoadingStore((s) => s.setLoading);
 
   const onLogout = async () => {
     setLoading(true);
     try {
-      await logoutUseCase();
+      await adminLogoutUseCase();
       navigate(ROUTER_URL.ADMIN_ROUTER.LOGIN, { replace: true });
     } catch (err) {
       if (err instanceof HttpError) {
@@ -44,7 +44,7 @@ export default function AdminHeader({ onToggleSidebar }: AdminHeaderProps) {
         {/* User dropdown */}
         <div className="relative group">
           <div className="flex items-center gap-2 cursor-pointer select-none">
-            <span className="text-sm font-medium">{user?.email ?? "Admin"}</span>
+            {userProfile && <span className="text-sm font-medium">{userProfile.user.email ?? "Admin"}</span>}
             <User className="w-6 h-6 text-slate-600" />
           </div>
 

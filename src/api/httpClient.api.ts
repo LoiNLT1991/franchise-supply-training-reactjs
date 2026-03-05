@@ -35,6 +35,11 @@ export const httpClient: HttpClient = {
     return res.data.data;
   },
 
+  async patch<T, D>(config: HttpRequestConfig<D>): Promise<T | null> {
+    const res = await axiosClient.patch<ApiSuccessResponse<T>>(config.url, config.data, { headers: config.headers });
+    return res.data.data;
+  },
+
   async delete<T, P extends Record<string, unknown>>(config: HttpRequestConfig<never, P>): Promise<T | null> {
     const res = await axiosClient.delete<ApiSuccessResponse<T>>(config.url, {
       params: cleanParams(config.params),

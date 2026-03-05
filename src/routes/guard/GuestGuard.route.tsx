@@ -1,21 +1,38 @@
-import { useAuthStore } from "@/stores";
+import { useAdminAuthStore } from "@/stores";
 import type { JSX } from "react";
 import { Navigate } from "react-router-dom";
 import { ROUTER_URL } from "../router.const";
+import { showWarning } from "@/utils";
 
 interface Props {
   children: JSX.Element;
 }
 
-export const GuestGuard = ({ children }: Props) => {
-  const { isLoggedIn, isInitialized } = useAuthStore();
+export const GuestAdminGuard = ({ children }: Props) => {
+  const { isLoggedIn, isInitialized } = useAdminAuthStore();
 
   if (!isInitialized) {
-    return null; 
+    return null;
   }
 
   if (isLoggedIn) {
+    showWarning("You are already logged in.");
     return <Navigate to={`${ROUTER_URL.ADMIN}/${ROUTER_URL.ADMIN_ROUTER.DASHBOARD}`} replace />;
+  }
+
+  return children;
+};
+
+export const GuestClientGuard = ({ children }: Props) => {
+  const { isLoggedIn, isInitialized } = useAdminAuthStore();
+
+  if (!isInitialized) {
+    return null;
+  }
+
+  if (isLoggedIn) {
+    showWarning("You are already logged in.");
+    return <Navigate to={`${ROUTER_URL.HOME}`} replace />;
   }
 
   return children;

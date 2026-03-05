@@ -1,17 +1,21 @@
-import { ROLE } from "@/models";
-import { useAuthStore } from "@/stores";
+import { Loading } from "@/layouts";
+import { useCustomerAuthStore } from "@/stores";
 import { Navigate, Outlet } from "react-router-dom";
 import { ROUTER_URL } from "../router.const";
 
 const ClientGuard = () => {
-  const { user, isInitialized } = useAuthStore();
+  const customer = useCustomerAuthStore((s) => s.customer);
+  const isInitialized = useCustomerAuthStore((s) => s.isInitialized);
 
-  if (!isInitialized) return null;
+  if (!isInitialized) {
+    return <Loading />;
+  }
 
-  if (!user || user.role !== ROLE.CUSTOMER) {
-    return <Navigate to={ROUTER_URL.CLIENT_ROUTER.LOGIN} replace />;
+  if (!customer) {
+    return <Navigate to={ROUTER_URL.HOME} replace />;
   }
 
   return <Outlet />;
 };
+
 export default ClientGuard;

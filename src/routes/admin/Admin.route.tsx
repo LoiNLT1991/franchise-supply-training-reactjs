@@ -5,13 +5,15 @@ import { ROUTER_URL } from "../router.const";
 import { ADMIN_MENU } from "./Admin.menu.tsx";
 
 export const AdminRoutes = (
-  <Route element={<AdminGuard />}>
-    <Route path={ROUTER_URL.ADMIN} element={<AdminLayout />}>
-      <Route index element={<Navigate to={ROUTER_URL.ADMIN_ROUTER.DASHBOARD} replace />} />
+  <Route element={<AdminLayout />}>
+    <Route element={<AdminGuard />}>
+      <Route path={ROUTER_URL.ADMIN}>
+        <Route index element={<Navigate to={ROUTER_URL.ADMIN_ROUTER.DASHBOARD} replace />} />
 
-      {ADMIN_MENU.map((item) => (
-        <Route key={item.path} path={item.path} element={<item.component />} />
-      ))}
+        {ADMIN_MENU.map((item) => (
+          <Route key={item.path} path={item.path} element={<item.component />} />
+        ))}
+      </Route>
     </Route>
   </Route>
 );

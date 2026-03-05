@@ -1,16 +1,23 @@
-import { isNonCustomerRole } from "@/models";
-import { useAuthStore } from "@/stores";
+import { useAdminAuthStore } from "@/stores";
 import { Navigate, Outlet } from "react-router-dom";
 import { ROUTER_URL } from "../router.const";
+import { Loading } from "@/layouts";
 
 const AdminGuard = () => {
-  const { user, isInitialized } = useAuthStore();
-  console.log(3);
+  const user = useAdminAuthStore((s) => s.user);
+  const isInitialized = useAdminAuthStore((s) => s.isInitialized);
+
   if (!isInitialized) {
-    return null;
+    return <Loading />;
   }
 
-  if (!user || !isNonCustomerRole(user.role)) {
+  // 1: not login
+  if (!user) {
+    return <Navigate to={ROUTER_URL.ADMIN_ROUTER.LOGIN} replace />;
+  }
+
+  // 2: logged but not select role context
+  if (!user.active_context) {
     return <Navigate to={ROUTER_URL.ADMIN_ROUTER.LOGIN} replace />;
   }
 

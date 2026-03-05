@@ -1,15 +1,20 @@
 export const ROUTER_URL = {
   HOME: "/",
 
+  MENU: `/menu`,
+  STORE: `/stores`,
   ABOUT: `/about`,
   CONTACT: `/contact`,
   VERSION: `/version`,
 
   CLIENT: `/client`,
   CLIENT_ROUTER: {
+    REGISTER: `/client/register`,
     LOGIN: `/client/login`,
+    PROFILE: `/client/profile`,
     FORGOT_PASSWORD: `/client/forgot-password`,
     CART: `cart`,
+    ORDER: `order`,
     PAYMENT: `payment`,
     CHECKOUT: `checkout`,
     PRODUCTS: `products`,

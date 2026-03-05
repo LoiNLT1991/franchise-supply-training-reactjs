@@ -68,8 +68,29 @@ export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode
 
 export const API_PATHS = {
   ADMIN: {
-    AUTH: "api/auth",
-    LOGIN: "api/auth",
-    LOGOUT: "api/auth/logout",
+    AUTH: {
+      DEFAULT: "api/auth",
+      SWITCH_CONTEXT: "api/auth/switch-context",
+      REFRESH_TOKEN: "/api/auth/refresh-token",
+      LOGOUT: "api/auth/logout",
+    },
+  },
+  CLIENT: {
+    AUTH: {
+      DEFAULT: "api/customer-auth",
+      REFRESH_TOKEN: "/api/customer-auth/refresh-token",
+      LOGOUT: "api/customer-auth/logout",
+    },
+    PUBLIC: {
+      CLIENT_01: "/api/clients/franchises",
+      CLIENT_02: (franchiseId: string) => `/api/clients/franchises/${franchiseId}/categories`,
+      CLIENT_03: (franchiseId: string, categoryId?: string) =>
+        `/api/clients/menu?franchiseId=${franchiseId}&categoryId=${categoryId ?? ""}`,
+      CLIENT_04: (franchiseId: string, categoryId?: string) =>
+        `/api/clients/products?franchiseId=${franchiseId}&categoryId=${categoryId ?? ""}`,
+      CLIENT_05: (franchiseId: string, productId: string) =>
+        `/api/clients/franchises/${franchiseId}/products/${productId}`,
+      CLIENT_06: (franchiseId: string) => `/api/clients/franchises/${franchiseId}`,
+    },
   },
 };

@@ -1,10 +1,10 @@
-import { useAuthStore } from "@/stores";
-import { logoutApi } from "../services/logout.api";
+import { useAdminAuthStore } from "@/stores";
+import { adminLogoutApi } from "../services/Auth07.service";
 
-export const logoutUseCase = async () => {
+export const adminLogoutUseCase = async () => {
   try {
-    await logoutApi();
+    await adminLogoutApi();
   } finally {
-    useAuthStore.getState().clearUser();
+    useAdminAuthStore.getState().clearUser();
   }
 };

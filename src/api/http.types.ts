@@ -1,3 +1,5 @@
+import type { ApiFieldError } from "@/models";
+
 export interface HttpRequestConfig<TData = unknown, TParams extends Record<string, unknown> = Record<string, unknown>> {
   url: string;
   data?: TData;
@@ -13,6 +15,8 @@ export interface HttpClient {
   post<T, D = unknown>(config: HttpRequestConfig<D>): Promise<T | null>;
 
   put<T, D = unknown>(config: HttpRequestConfig<D>): Promise<T | null>;
+
+  patch<T, D = unknown>(config: HttpRequestConfig<D>): Promise<T | null>;
 
   delete<T, P extends Record<string, unknown> = Record<string, unknown>>(
     config: HttpRequestConfig<never, P>,
@@ -37,11 +41,13 @@ export interface ApiErrorItem {
 
 export class HttpError extends Error {
   status: number;
-  errors?: ApiErrorItem[];
+  errors?: ApiFieldError[];
 
-  constructor(params: { status: number; message: string; errors?: ApiErrorItem[] }) {
-    super(params.message);
-    this.status = params.status;
-    this.errors = params.errors;
+  constructor({ status, message, errors }: { status: number; message: string; errors?: ApiFieldError[] }) {
+    super(message);
+
+    this.name = "HttpError";
+    this.status = status;
+    this.errors = errors;
   }
 }

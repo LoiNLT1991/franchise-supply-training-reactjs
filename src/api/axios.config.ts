@@ -1,7 +1,7 @@
 import { ENV } from "@/config";
-import { LOCAL_STORAGE } from "@/consts";
-import { getItemInLocalStorage } from "@/utils";
-import axios from "axios";
+import { refreshAdminTokenApi, refreshCustomerTokenApi } from "@/features";
+import { useAdminAuthStore, useCustomerAuthStore } from "@/stores";
+import axios, { HttpStatusCode } from "axios";
 import { HttpError, type ApiErrorResponse } from "./http.types";
 
 export const axiosClient = axios.create({
@@ -21,13 +21,6 @@ export const setupApi = () => {
 export const requestInterceptor = () => {
   axiosClient.interceptors.request.use(
     (config) => {
-      // TODO: after production will remove because BE auto set token in cookie
-      const user: any = getItemInLocalStorage(LOCAL_STORAGE.ACCOUNT_USER);
-      if (user?.access_token) {
-        config.headers = config.headers ?? {};
-        config.headers.Authorization = `Bearer ${user.access_token}`;
-      }
-
       return config;
     },
     (error) => Promise.reject(error),
@@ -37,17 +30,58 @@ export const requestInterceptor = () => {
 export const responseInterceptor = () => {
   axiosClient.interceptors.response.use(
     (response) => response,
-    (error) => {
-      // HTTP error (401, 500...)
+    async (error) => {
       const status = error.response?.status ?? 0;
       const data = error.response?.data as ApiErrorResponse | undefined;
 
-      const message = data?.message ?? data?.errors?.[0]?.message ?? error.message ?? "Request failed";
+      const message =
+        data?.message ??
+        (data?.errors?.length ? data.errors.map((e) => e.message).join(", ") : undefined) ??
+        error.message ??
+        "Request failed";
+
+      console.log("INTERCEPTOR HIT");
+      console.log("data", data);
+
+      const originalRequest = error.config;
+
+      // ✅ Handle 401
+      if (status === HttpStatusCode.Unauthorized && !originalRequest?._retry) {
+        originalRequest._retry = true;
+
+        const url = originalRequest?.url ?? "";
+        const pathname = new URL(url, window.location.origin).pathname;
+
+        const isAdminApi = pathname.startsWith("/api/auth") && message === "ACCESS_TOKEN_EXPIRED";
+        const isClientApi = pathname.startsWith("/api/customer-auth") && message === "CUSTOMER_ACCESS_TOKEN_EXPIRED";
+
+        try {
+          if (isAdminApi) {
+            console.log("REFRESH TOKEN CALLED");
+            await refreshAdminTokenApi();
+          }
+
+          if (isClientApi) {
+            console.log("REFRESH TOKEN CALLED");
+            await refreshCustomerTokenApi();
+          }
+
+          return axiosClient(originalRequest);
+        } catch {
+          if (isAdminApi) {
+            useAdminAuthStore.getState().clearUser();
+          }
+
+          if (isClientApi) {
+            useCustomerAuthStore.getState().clearCustomer();
+          }
+        }
+      }
 
       throw new HttpError({
         status,
         message,
-        errors: data?.errors ?? undefined,
+        errors: data?.errors ?? [],
       });
     },
   );

@@ -1,14 +1,22 @@
 import type { Role } from "@/models";
 
+export const LoginFieldName = {
+  Email: "email",
+  Password: "password",
+} as const;
+
+export const LoginFieldTitle = {
+  Email: "Email",
+  Password: "Password",
+} as const;
+
 export interface LoginPayload {
-  email: string;
-  password: string;
+  [LoginFieldName.Email]: string;
+  [LoginFieldName.Password]: string;
 }
 
-export interface UserProfile {
-    id: string;
-    email: string;
-    role: Role;
-    phone: string;
-    name: string;
+export interface SwitchContextPayload {
+  franchise_id: string;
 }
+
+export type LoginResult = { type: "SUCCESS" } | { type: "REQUIRE_CONTEXT"; roles: Role[] };

@@ -11,6 +11,12 @@ export type ClientMenuItem = {
 
 export const CLIENT_MENU: ClientMenuItem[] = [
   {
+    label: "Profile",
+    path: ROUTER_URL.CLIENT_ROUTER.PROFILE,
+    component: React.lazy(() => import("@/pages/client/profile/ClientProfile.page")),
+    isEnd: true,
+  },
+  {
     label: "Cart",
     path: ROUTER_URL.CLIENT_ROUTER.CART,
     component: React.lazy(() => import("@/pages/client/cart/Cart.page")),
@@ -22,4 +28,4 @@ export const CLIENT_MENU: ClientMenuItem[] = [
     component: React.lazy(() => import("@/pages/client/payment/Payment.page")),
     isEnd: true,
   },
-]
+];
